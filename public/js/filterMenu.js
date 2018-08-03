@@ -1,16 +1,15 @@
-'use strict';
 
 var MenuComponent = React.createClass({
   displayName: 'MenuComponent',
 
 
-  getInitialState: function getInitialState() {
+  getInitialState: function () {
     return {
       data: []
     };
   },
 
-  fetchData: function fetchData() {
+  fetchData: function () {
     $.ajax({
       type: 'GET',
       url: '/data',
@@ -24,12 +23,21 @@ var MenuComponent = React.createClass({
     });
   },
 
-  componentDidMount: function componentDidMount() {
+  componentDidMount() {
     this.fetchData();
   },
 
-
-  render: function render() {
+  render: function () {
+    var menuTitles = ["Iris", "MPG"];
+    var menuItems = menuTitles.map(function (item, index) {
+      return React.createElement(
+        'a',
+        { key: index, href: '#', className: 'w3-bar-item w3-button w3-padding' },
+        React.createElement('i', { key: index, className: 'fa fa-users fa-fw' }),
+        '\xA0',
+        item
+      );
+    });
     return React.createElement(
       'div',
       { 'class': 'w3-bar-block' },
@@ -39,54 +47,7 @@ var MenuComponent = React.createClass({
         React.createElement('i', { className: 'fa fa-users fa-fw' }),
         '\xA0 Overview'
       ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-eye fa-fw' }),
-        '\xA0 Views'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-users fa-fw' }),
-        '\xA0 Traffic'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-bullseye fa-fw' }),
-        '\xA0 Geo'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-diamond fa-fw' }),
-        '\xA0 Orders'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-bell fa-fw' }),
-        '\xA0 News'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-bank fa-fw' }),
-        '\xA0 General'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-history fa-fw' }),
-        '\xA0 History'
-      ),
-      React.createElement(
-        'a',
-        { href: '#', className: 'w3-bar-item w3-button w3-padding' },
-        React.createElement('i', { className: 'fa fa-cog fa-fw' }),
-        '\xA0 Settings'
-      )
+      menuItems
     );
   }
 });
