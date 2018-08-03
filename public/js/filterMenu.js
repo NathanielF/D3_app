@@ -1,4 +1,3 @@
-
 var MenuComponent = React.createClass({
   displayName: 'MenuComponent',
 
@@ -9,47 +8,47 @@ var MenuComponent = React.createClass({
     };
   },
 
-  fetchData: function () {
+  fetchData: function (dataset) {
+    var dataUrl = '/' + dataset;
     $.ajax({
       type: 'GET',
-      url: '/data',
+      url: dataUrl,
       dataType: 'json',
       success: function (result) {
         this.setState({ data: result });
       }.bind(this),
       error: function (xhr, status, err) {
-        console.error("/data", status, err.toString());
-      }.bind(this)
+        console.error(dataUrl, status, err.toString());
+      }
     });
   },
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchData('Iris');
   },
 
   render: function () {
-    var menuTitles = ["Iris", "MPG"];
+    var menuTitles = ['Iris', 'MPG'];
     var menuItems = menuTitles.map(function (item, index) {
       return React.createElement(
-        'a',
-        { key: index, href: '#', className: 'w3-bar-item w3-button w3-padding' },
+        'button',
+        { value: item, onClick: () => this.fetchData(item), key: 'menuButton:' + index, className: 'w3-bar-item w3-button w3-padding' },
         React.createElement('i', { key: index, className: 'fa fa-users fa-fw' }),
-        '\xA0',
         item
       );
-    });
+    }.bind(this));
     return React.createElement(
       'div',
       { 'class': 'w3-bar-block' },
       React.createElement(
-        'a',
+        'button',
         { href: '#', className: 'w3-bar-item w3-button w3-padding w3-blue' },
         React.createElement('i', { className: 'fa fa-users fa-fw' }),
-        '\xA0 Overview'
+        'Menu'
       ),
       menuItems
     );
   }
 });
 
-var MenuComponent = ReactDOM.render(React.createElement(MenuComponent, null), document.getElementById('menuItems'));
+var Menu = React.render(React.createElement(MenuComponent, null), document.getElementById('menuItems'));

@@ -20,44 +20,60 @@ func init() {
 	home = page{htmlTemp: tpl}
 }
 
+// Establishing our HTML skeleton and building functions to serve
+// the basic skeleton
+
 var html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>D3 Application</title>
-  <meta name="description" content="The HTML5 Herald">
-  <meta name="author" content="SitePoint">
+  <meta name="description" content="D3 app">
+  <meta name="author" content="Nathaniel Forde">
   <script src="public/js/react.js"></script>
   <link rel="stylesheet" type="text/css" href="public/css/w3.css">.
-  <script src="public/js/reactDom.js"></script>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
+	<script src="public/js/reactDom.js"></script>
+	<script src="public/js/jQuery.js"></script>
 </head>
 
 <body>
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
-  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-  <span class="w3-bar-item w3-right">Logo</span>
+	<button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();">
+	<i class="fa fa-bars"></i>  
+		Menu
+	</button>
+	<span class="w3-bar-item w3-right">
+	D3 App 
+	</span>
 </div>
 
 
 <!-- Sidebar/menu -->
-<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar">
+<br>
   <div class="w3-container w3-row">
     <div class="w3-col s4">
-      <img src="/w3images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
+      <img src="public/images/avatar.png" class="w3-circle w3-margin-right" style="width:46px">
     </div>
     <div class="w3-col s8 w3-bar">
-      <span>Welcome</span><br>
-      <a href="#" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i></a>
-      <a href="#" class="w3-bar-item w3-button"><i class="fa fa-user"></i></a>
-      <a href="#" class="w3-bar-item w3-button"><i class="fa fa-cog"></i></a>
+			<span>Welcome</span>
+			<br>
+			<a href="#" class="w3-bar-item w3-button">
+			<i class="fa fa-envelope"></i>
+			</a>
+			<a href="#" class="w3-bar-item w3-button">
+			<i class="fa fa-user"></i>
+			</a>
+			<a href="#" class="w3-bar-item w3-button">
+			<i class="fa fa-cog"></i>
+			</a>
     </div>
-  </div>
-  <hr>
+	</div>
+	
+	<hr>
+	
   <div class="w3-container">
     <h5>Dashboard</h5>
   </div>
@@ -81,6 +97,8 @@ func (p page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+/// Getting the Iris data set to serve to our website.
 
 type observedFlower struct {
 	SepalLength float64 `json:"sepalLength"`
@@ -111,6 +129,7 @@ func (flowers observedFlowers) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	w.Write(observations)
 }
 
+// Accessing the database and serving the website.
 func main() {
 
 	pwd := os.Getenv("POSTGRES")
@@ -137,7 +156,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", home)
-	mux.Handle("/data", irisData)
+	mux.Handle("/Iris", irisData)
 	fs := http.FileServer(http.Dir("public"))
 	mux.Handle("/public/", http.StripPrefix("/public", fs))
 	fmt.Println("Listening:")
