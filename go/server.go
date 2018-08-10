@@ -30,10 +30,13 @@ var html = `<!doctype html>
   <title>D3 Application</title>
   <meta name="description" content="D3 app">
   <meta name="author" content="Nathaniel Forde">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="public/js/react.js"></script>
-  <link rel="stylesheet" type="text/css" href="public/css/w3.css">.
-	<script src="public/js/reactDom.js"></script>
-	<script src="public/js/jQuery.js"></script>
+  <link rel="stylesheet" type="text/css" href="public/css/w3.css">
+  <link rel="stylesheet" type="text/css" href="public/css/specific.css">
+  <script src="public/js/jQuery.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js'></script>
+  <script src="public/js/reactDom.js"></script>
 </head>
 
 <body>
@@ -80,6 +83,9 @@ var html = `<!doctype html>
   <div id="menuItems" class="w3-bar-block">
   </div>
 </nav>
+
+<div id = "tableDisplay">
+</div>
 
   <script src="public/js/filterMenu.js"></script>
 </body>

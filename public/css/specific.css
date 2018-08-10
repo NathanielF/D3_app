@@ -1,0 +1,9 @@
+#tableDisplay {
+    height: 300px;
+    margin-left: 350px;
+    width:70%;
+    margin-top: 150px;
+    overflow-y:auto;
+}
+
+
