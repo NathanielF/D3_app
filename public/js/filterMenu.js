@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-/* global React */
+/* global React data */
 
 var TableComponent = React.createClass({
   displayName: 'TableComponent',
@@ -7,7 +7,7 @@ var TableComponent = React.createClass({
 
   getInitialState: function () {
     return {
-      data: []
+      data: data.observations
     };
   },
 
@@ -55,6 +55,11 @@ var TableComponent = React.createClass({
     return React.createElement(
       'div',
       null,
+      React.createElement(
+        'h2',
+        { className: 'tableTitle' },
+        'DataTable'
+      ),
       tab
     );
   }
@@ -71,8 +76,14 @@ var MenuComponent = React.createClass({
     };
   },
 
-  fetchData: function (dataSet) {
-    var dataUrl = '/' + dataSet;
+  selectData: function (selection) {
+    location.href = '/?data=' + selection;
+    console.log('/?data=' + selection);
+    this.fetchData();
+  },
+
+  fetchData: function () {
+    var dataUrl = '/data';
     $.ajax({
       type: 'GET',
       url: dataUrl,
@@ -88,15 +99,15 @@ var MenuComponent = React.createClass({
   },
 
   componentDidMount() {
-    this.fetchData('Iris');
+    this.fetchData();
   },
 
   render: function () {
-    var menuTitles = ['Iris', 'MPG'];
+    var menuTitles = ['Iris', 'customers'];
     var menuItems = menuTitles.map(function (item, index) {
       return React.createElement(
         'button',
-        { value: item, onClick: () => this.fetchData(item),
+        { value: item, onClick: () => this.selectData(item),
           key: 'menuButton:' + index, className: 'w3-bar-item w3-button w3-padding' },
         React.createElement('i', { key: index, className: 'fa fa-users fa-fw' }),
         item

@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-/* global React */
+/* global React data */
 
 var TableComponent = React.createClass({
 
   getInitialState: function () {
     return {
-      data: []
+      data: data.observations
     }
   },
 
@@ -37,7 +37,10 @@ var TableComponent = React.createClass({
   render: function () {
     var data = this.state.data
     var tab = this.makeTable(data)
-    return (<div>{tab}</div>)
+    return (<div>
+      <h2 className = "tableTitle">DataTable</h2>
+      {tab}
+    </div>)
   }
 
 })
@@ -50,8 +53,14 @@ var MenuComponent = React.createClass({
     }
   },
 
-  fetchData: function (dataSet) {
-    var dataUrl = '/' + dataSet
+  selectData: function (selection) {
+    location.href = '/?data=' + selection
+    console.log('/?data=' + selection)
+    this.fetchData()
+  },
+
+  fetchData: function () {
+    var dataUrl = '/data'
     $.ajax({
       type: 'GET',
       url: dataUrl,
@@ -67,14 +76,14 @@ var MenuComponent = React.createClass({
   },
 
   componentDidMount () {
-    this.fetchData('Iris')
+    this.fetchData()
   },
 
   render: function () {
     var menuTitles = ['Iris', 'customers']
     var menuItems = menuTitles.map(function (item, index) {
       return (
-        <button value = {item} onClick = {() => this.fetchData(item)}
+        <button value = {item} onClick = {() => this.selectData(item)}
           key = {'menuButton:' + index} className="w3-bar-item w3-button w3-padding">
           <i key = {index} className="fa fa-users fa-fw"></i>
           {item}

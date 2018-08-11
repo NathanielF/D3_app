@@ -12,14 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var home page
-var err error
-
-func init() {
-	var tpl = template.Must(template.New("index.html").Parse(html))
-	home = page{htmlTemp: tpl}
-}
-
 // Establishing our HTML skeleton and building functions to serve
 // the basic skeleton
 
@@ -38,6 +30,10 @@ var html = `<!doctype html>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js'></script>
   <script src="public/js/reactDom.js"></script>
 </head>
+
+<script>
+var data = {{.}}; 
+</script>
 
 <body>
 
@@ -93,20 +89,43 @@ var html = `<!doctype html>
 
 type page struct {
 	htmlTemp *template.Template
+	params   map[string]string
+	db       *sql.DB
 }
 
 func (p page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := p.htmlTemp.Execute(w, nil)
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("Failed to parse form %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for key := range r.Form {
+		p.params[key] = r.Form.Get(key)
+		log.Println("home:", key, p.params[key])
+	}
+
+	data := getIris(p.db)
+
+	observations, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("Failed to parse json %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = p.htmlTemp.Execute(w, string(observations))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Failed to execute template", 500)
 		return
 	}
+
 }
 
 /// Getting the Iris data set to serve to our website.
 
-type observedFlower struct {
+type ObservedFlower struct {
 	SepalLength float64 `json:"sepalLength"`
 	SepalWidth  float64 `json:"sepalWidth"`
 	PetalLength float64 `json:"petalLength"`
@@ -114,11 +133,11 @@ type observedFlower struct {
 	Iris        string  `json:"iris"`
 }
 
-type observedFlowers struct {
-	obs []observedFlower
+type ObservedFlowers struct {
+	Obs []ObservedFlower `json:"observations"`
 }
 
-func (flowers observedFlowers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (flowers ObservedFlowers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Printf("Failed to parse form %v", err)
@@ -126,13 +145,35 @@ func (flowers observedFlowers) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	observations, err := json.Marshal(flowers.obs)
+	observations, err := json.Marshal(flowers.Obs)
 	if err != nil {
 		log.Printf("Failed to parse json %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Write(observations)
+}
+
+func getIris(db *sql.DB) ObservedFlowers {
+
+	rows, err := db.Query(`SELECT * FROM iris`)
+	if err != nil {
+		log.Println(err)
+	}
+
+	var irisData ObservedFlowers
+	for rows.Next() {
+		var i ObservedFlower
+		err = rows.Scan(&i.PetalLength,
+			&i.PetalWidth, &i.SepalLength, &i.SepalWidth, &i.Iris)
+		if err != nil {
+			log.Print(err)
+		}
+		irisData.Obs = append(irisData.Obs, i)
+	}
+
+	return irisData
+
 }
 
 // Accessing the database and serving the website.
@@ -144,25 +185,17 @@ func main() {
 	if err != nil {
 		log.Print(err)
 	}
-	rows, err := db.Query(`SELECT * FROM iris`)
-	if err != nil {
-		log.Print(err)
-	}
 
-	var irisData observedFlowers
-	for rows.Next() {
-		var i observedFlower
-		err = rows.Scan(&i.PetalLength,
-			&i.PetalWidth, &i.SepalLength, &i.SepalWidth, &i.Iris)
-		if err != nil {
-			log.Print(err)
-		}
-		irisData.obs = append(irisData.obs, i)
+	var tpl = template.Must(template.New("index.html").Parse(html))
+	var home = page{
+		htmlTemp: tpl,
+		params:   map[string]string{},
+		db:       db,
 	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", home)
-	mux.Handle("/Iris", irisData)
+	//mux.Handle("/data", data)
 	fs := http.FileServer(http.Dir("public"))
 	mux.Handle("/public/", http.StripPrefix("/public", fs))
 	fmt.Println("Listening:")
