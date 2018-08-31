@@ -2,8 +2,27 @@
     height: 300px;
     margin-left: 350px;
     width:70%;
-    margin-top: 150px;
+    margin-top: 50px;
     overflow-y:auto;
 }
 
-
+body {
+    font: 10px sans-serif;
+  }
+  
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .dot {
+    stroke: #000;
+  }
+  
+  .tooltip {
+      position: absolute;
+      width: 200px;
+      height: 28px;
+      pointer-events: none;
+  }

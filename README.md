@@ -1,3 +1,9 @@
+App to construct a basic graph for typical 
+data science data sets and display associated data table
+
+![alt text](public/images/BasicView.png)
+
+
 To have babel transpile our JSX code first set up our 
 package.json and .babelrc files 
 
