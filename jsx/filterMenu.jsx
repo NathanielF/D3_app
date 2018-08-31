@@ -5,7 +5,7 @@ var TableComponent = React.createClass({
 
   getInitialState: function () {
     return {
-      data: data.observations
+      data: data
     }
   },
 

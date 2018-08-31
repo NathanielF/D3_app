@@ -27,6 +27,7 @@ var html = `<!doctype html>
   <link rel="stylesheet" type="text/css" href="public/css/w3.css">
   <link rel="stylesheet" type="text/css" href="public/css/specific.css">
   <script src="public/js/jQuery.js"></script>
+  <script src="http://d3js.org/d3.v4.min.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js'></script>
   <script src="public/js/reactDom.js"></script>
 </head>
@@ -54,7 +55,7 @@ var data = {{.}};
 <br>
   <div class="w3-container w3-row">
     <div class="w3-col s4">
-      <img src="public/images/avatar.png" class="w3-circle w3-margin-right" style="width:46px">
+      <img src="public/images/avatar.png" class="w3-circle w3-margin-right" style="width:46px;margin-top:50px">
     </div>
     <div class="w3-col s8 w3-bar">
 			<span>Welcome</span>
@@ -80,8 +81,13 @@ var data = {{.}};
   </div>
 </nav>
 
+<div id = "irisPlot">
+<script src="public/js/irisPlot.js"></script>
+</div>
+
 <div id = "tableDisplay">
 </div>
+
 
   <script src="public/js/filterMenu.js"></script>
 </body>
@@ -106,7 +112,7 @@ func (p page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println("home:", key, p.params[key])
 	}
 
-	data := getIris(p.db)
+	data := getIris(p.db).Obs
 
 	observations, err := json.Marshal(data)
 	if err != nil {
@@ -125,33 +131,18 @@ func (p page) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 /// Getting the Iris data set to serve to our website.
 
+// ObservedFlower is a row detail in the iris data set
 type ObservedFlower struct {
-	SepalLength float64 `json:"sepalLength"`
-	SepalWidth  float64 `json:"sepalWidth"`
-	PetalLength float64 `json:"petalLength"`
-	PetalWidth  float64 `json:"petalWidth"`
-	Iris        string  `json:"iris"`
+	SepalLength float64 `json:"sepal_length"`
+	SepalWidth  float64 `json:"sepal_width"`
+	PetalLength float64 `json:"petal_length"`
+	PetalWidth  float64 `json:"petal_width"`
+	Iris        string  `json:"species"`
 }
 
+// ObservedFlowers collects the iris data set into a slice.
 type ObservedFlowers struct {
 	Obs []ObservedFlower `json:"observations"`
-}
-
-func (flowers ObservedFlowers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Printf("Failed to parse form %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	observations, err := json.Marshal(flowers.Obs)
-	if err != nil {
-		log.Printf("Failed to parse json %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write(observations)
 }
 
 func getIris(db *sql.DB) ObservedFlowers {
